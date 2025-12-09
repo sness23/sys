@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  bio           String?
+  avatarUrl     String?
+  venmoHandle   String?
+  cashAppHandle String?
+  paypalHandle  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  skills           Skill[]
+  needs            Need[]
+  sentRequests     ServiceRequest[] @relation("Requester")
+  receivedRequests ServiceRequest[] @relation("Provider")
+  connections1     Connection[]     @relation("User1")
+  connections2     Connection[]     @relation("User2")
+  invitesSent      Invite[]         @relation("Inviter")
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  price       Int
+  priceType   String   @default("FLAT")
+  category    String
+  tags        String   @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  requests ServiceRequest[]
+
+  @@index([userId])
+  @@index([category])
+}
+
+model Need {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  budget      Int?
+  category    String
+  isFulfilled Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([category])
+}
+
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  skillId     String
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  requesterId String
+  requester   User     @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  providerId  String
+  provider    User     @relation("Provider", fields: [providerId], references: [id], onDelete: Cascade)
+  message     String?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([skillId])
+  @@index([requesterId])
+  @@index([providerId])
+}
+
+model Connection {
+  id        String   @id @default(cuid())
+  userId1   String
+  user1     User     @relation("User1", fields: [userId1], references: [id], onDelete: Cascade)
+  userId2   String
+  user2     User     @relation("User2", fields: [userId2], references: [id], onDelete: Cascade)
+  status    String   @default("ACCEPTED")
+  createdAt DateTime @default(now())
+
+  @@unique([userId1, userId2])
+  @@index([userId1])
+  @@index([userId2])
+}
+
+model Invite {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  inviterId String
+  inviter   User      @relation("Inviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  usedById  String?
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([code])
+}

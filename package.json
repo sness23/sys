@@ -1,0 +1,22 @@
+{
+  "name": "sys",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sell Yourself - A peer-to-peer skills marketplace for friends",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=api",
+    "dev:web": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=api && npm run build --workspace=web",
+    "db:push": "npm run db:push --workspace=api",
+    "db:generate": "npm run db:generate --workspace=api",
+    "db:studio": "npm run db:studio --workspace=api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
