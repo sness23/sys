@@ -137,12 +137,17 @@ router.patch('/:id', requireAuth, async (req, res) => {
 
     const data = updateSkillSchema.parse(req.body);
 
+    const updateData: any = { ...data };
+    if (data.tags) {
+      updateData.tags = JSON.stringify(data.tags);
+    }
+
     const updated = await db.skill.update({
       where: { id: req.params.id },
-      data,
+      data: updateData,
     });
 
-    res.json(updated);
+    res.json({ ...updated, tags: JSON.parse(updated.tags) });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });

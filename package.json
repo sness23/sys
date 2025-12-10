@@ -12,6 +12,10 @@
     "dev:api": "npm run dev --workspace=api",
     "dev:web": "npm run dev --workspace=web",
     "build": "npm run build --workspace=api && npm run build --workspace=web",
+    "start": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop sys-api",
+    "restart": "pm2 restart sys-api",
+    "logs": "pm2 logs sys-api",
     "db:push": "npm run db:push --workspace=api",
     "db:generate": "npm run db:generate --workspace=api",
     "db:studio": "npm run db:studio --workspace=api"
